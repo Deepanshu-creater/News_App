@@ -155,7 +155,7 @@ function Login() {
             e.preventDefault();
             setIsLoading(true);
             
-            const data = await fetch('/login', {
+            const data = await fetch('https://news-app-khcy.onrender.com/login', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
