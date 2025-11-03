@@ -1,3 +1,4 @@
 server/config.env
 server/node_modules
 this is a comment
+client/node_modules
