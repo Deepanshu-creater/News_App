@@ -15,7 +15,17 @@ function News(props) {
   const searchQuery = (e) => {
     e.preventDefault();
     setQuery(search);
-    setSearch(""); // Clear search input after submit
+    setSearch("");
+  };
+
+  // Function to get backend URL based on environment
+  const getBackendURL = () => {
+    // For production - use relative path since both are on same domain
+    if (process.env.NODE_ENV === "production") {
+      return ""; // Empty string for same domain
+    }
+    // For development
+    return "http://localhost:5000";
   };
 
   useEffect(() => {
@@ -24,26 +34,48 @@ function News(props) {
       setError(null);
       
       try {
-        // Use relative path since both frontend and backend are on same domain
-        const backendURL = process.env.NODE_ENV === "production" 
-          ? "" // Empty string for same domain in production
-          : "http://localhost:5000";
-
+        const backendURL = getBackendURL();
         const topic = query || props.category || "latest";
         
-        console.log("Fetching news for topic:", topic); // Debug log
+        console.log("Fetching news for topic:", topic);
+        console.log("Backend URL:", backendURL);
         
-        const response = await fetch(
-          `${backendURL}/api/news?topic=${encodeURIComponent(topic)}`
-        );
+        const apiUrl = `${backendURL}/api/news?topic=${encodeURIComponent(topic)}`;
+        console.log("Full API URL:", apiUrl);
+
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          // Remove credentials if not needed, or keep if your API requires auth
+          // credentials: 'include'
+        });
+
+        // First, get the response as text to check if it's valid JSON
+        const responseText = await response.text();
+        console.log("Raw response:", responseText.substring(0, 200)); // Log first 200 chars
+
+        // Check if response is HTML (error page)
+        if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html')) {
+          throw new Error("Server returned HTML page instead of JSON. Check backend URL.");
+        }
+
+        // Try to parse as JSON
+        let data;
+        try {
+          data = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error("JSON parse error:", parseError);
+          throw new Error("Invalid JSON response from server");
+        }
 
         // Check if response is OK
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const data = await response.json();
-        console.log("API Response:", data); // Debug log
+        console.log("Parsed API Response:", data);
 
         // Handle different response structures
         if (data.success === false) {
@@ -53,7 +85,6 @@ function News(props) {
         if (data.articles && Array.isArray(data.articles)) {
           setArticles(data.articles);
         } else {
-          // If articles is not an array or doesn't exist
           setArticles([]);
           setError("No articles found in response");
         }
@@ -96,7 +127,9 @@ function News(props) {
       {error && (
         <div className="container">
           <div className="alert alert-danger" role="alert">
-            Error: {error}
+            <strong>Error:</strong> {error}
+            <br />
+            <small>Please check if the backend server is running.</small>
           </div>
         </div>
       )}
