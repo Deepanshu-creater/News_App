@@ -18,7 +18,7 @@ app.use(cookieParser());
 app.use(cors({
     origin: [
         'http://localhost:3000',                // your local React app
-        'https://your-frontend-name.vercel.app' // your deployed frontend link
+        'https://news-app-eta-six-52.vercel.app/' // your deployed frontend link
     ],
     credentials: true // allows cookies / tokens to be sent
 }));
