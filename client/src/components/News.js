@@ -25,7 +25,7 @@ function News(props) {
       return ""; // Empty string for same domain
     }
     // For development
-    return "http://localhost:5000";
+    return "https://news-app-khcy.onrender.com";
   };
 
   useEffect(() => {

@@ -31,7 +31,7 @@ function SignUpForm() {
         const { firstName, lastName, userName, email, phone, password, cpassword } = userData;
 
         // Fetching the data and sending to the server
-        const data = await fetch("/register", {
+        const data = await fetch("https://news-app-khcy.onrender.com/register", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

@@ -11,7 +11,7 @@ function Profile() {
         const callProfilePage = async () => {
             try {
                 setLoading(true);
-                const response = await fetch('/profile', {
+                const response = await fetch('https://news-app-khcy.onrender.com/profile', {
                     method: "GET",
                     headers: {
                         Accept: "application/json",

@@ -7,7 +7,7 @@ function Logout() {
     const { state, dispatch } = useContext(UserContext)
     const navigate = useNavigate();
     useEffect(() => {
-        fetch('/logout', {
+        fetch('https://news-app-khcy.onrender.com/logout', {
             method: "GET",
             headers: {
                 Accept: "application/json",

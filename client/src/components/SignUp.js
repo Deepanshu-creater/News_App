@@ -157,7 +157,7 @@ function SignUp() {
         const { firstName, lastName, userName, email, phone, password, cpassword } = user;
 
         try {
-            const data = await fetch("/register", {
+            const data = await fetch("https://news-app-khcy.onrender.com/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

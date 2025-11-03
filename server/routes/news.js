@@ -11,7 +11,7 @@ const GNEWS_API_KEY = process.env.GNEWS_API_KEY;
 router.use((req, res, next) => {
   const allowedOrigins = [
     'http://localhost:3000',
-    'https://your-frontend-domain.vercel.app', // Replace with your actual frontend domain
+    'https://news-app-eta-six-52.vercel.app/', // Replace with your actual frontend domain
     process.env.FRONTEND_URL
   ];
   
