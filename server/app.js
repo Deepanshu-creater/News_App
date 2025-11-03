@@ -25,6 +25,7 @@ app.use(cors({
 
 // Express Router
 app.use(require('./routes/auth'));
+app.use("/api/news", require("./routes/news"));
 
 // Start server
 app.listen(port, () => {
