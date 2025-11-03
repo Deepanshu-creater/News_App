@@ -3,7 +3,7 @@ const app = express();
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
-const cors = require('cors'); // ✅ add this
+const cors = require('cors');
 
 // Dotenv
 dotenv.config({ path: './config.env' });
@@ -14,14 +14,19 @@ require('./db/connect');
 app.use(express.json());
 app.use(cookieParser());
 
-// ✅ Enable CORS for both local and deployed frontend
+// ✅ Enable CORS for both local and deployed frontend (FIXED)
 app.use(cors({
     origin: [
-        'http://localhost:3000',                // your local React app
-        'https://news-app-eta-six-52.vercel.app/' // your deployed frontend link
+        'http://localhost:3000',                
+        'https://news-app-eta-six-52.vercel.app' 
     ],
-    credentials: true // allows cookies / tokens to be sent
+    credentials: true, // allows cookies / tokens to be sent
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
 }));
+
+// Handle preflight requests explicitly
+app.options('*', cors()); // This handles OPTIONS preflight requests
 
 // Express Router
 app.use(require('./routes/auth'));
