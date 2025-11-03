@@ -18,14 +18,8 @@ function News(props) {
     setSearch("");
   };
 
-  // Function to get backend URL based on environment
   const getBackendURL = () => {
-    // For production - use relative path since both are on same domain
-    if (process.env.NODE_ENV === "production") {
-      return ""; // Empty string for same domain
-    }
-    // For development
-    return "https://news-app-khcy.onrender.com";
+    return "https://news-app-khcy.onrender.com"; 
   };
 
   useEffect(() => {
@@ -38,7 +32,6 @@ function News(props) {
         const topic = query || props.category || "latest";
         
         console.log("Fetching news for topic:", topic);
-        console.log("Backend URL:", backendURL);
         
         const apiUrl = `${backendURL}/api/news?topic=${encodeURIComponent(topic)}`;
         console.log("Full API URL:", apiUrl);
@@ -48,39 +41,18 @@ function News(props) {
           headers: {
             'Content-Type': 'application/json',
           },
-          // Remove credentials if not needed, or keep if your API requires auth
-          // credentials: 'include'
+          mode: 'cors' // Explicitly enable CORS
         });
 
-        // First, get the response as text to check if it's valid JSON
-        const responseText = await response.text();
-        console.log("Raw response:", responseText.substring(0, 200)); // Log first 200 chars
+        console.log("Response status:", response.status);
+        console.log("Response headers:", response.headers);
 
-        // Check if response is HTML (error page)
-        if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html')) {
-          throw new Error("Server returned HTML page instead of JSON. Check backend URL.");
-        }
-
-        // Try to parse as JSON
-        let data;
-        try {
-          data = JSON.parse(responseText);
-        } catch (parseError) {
-          console.error("JSON parse error:", parseError);
-          throw new Error("Invalid JSON response from server");
-        }
-
-        // Check if response is OK
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        console.log("Parsed API Response:", data);
-
-        // Handle different response structures
-        if (data.success === false) {
-          throw new Error(data.error || "Failed to fetch news");
-        }
+        const data = await response.json();
+        console.log("API Response:", data);
 
         if (data.articles && Array.isArray(data.articles)) {
           setArticles(data.articles);
@@ -91,7 +63,16 @@ function News(props) {
         
       } catch (error) {
         console.error("Error fetching news:", error);
-        setError(error.message);
+        
+        // More specific error messages
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          setError("Network error: Cannot connect to backend server. This is likely a CORS issue.");
+        } else if (error.message.includes('Unexpected token')) {
+          setError("Backend returned HTML instead of JSON. Check if CORS is enabled on the server.");
+        } else {
+          setError(error.message);
+        }
+        
         setArticles([]);
       } finally {
         setLoading(false);
@@ -123,13 +104,14 @@ function News(props) {
         </form>
       </div>
 
-      {/* Error Message */}
       {error && (
         <div className="container">
-          <div className="alert alert-danger" role="alert">
-            <strong>Error:</strong> {error}
+          <div className="alert alert-warning" role="alert">
+            <strong>CORS Issue Detected:</strong> {error}
             <br />
-            <small>Please check if the backend server is running.</small>
+            <small>
+              Backend needs CORS enabled. The API works in Thunder Client because it doesn't enforce CORS.
+            </small>
           </div>
         </div>
       )}
