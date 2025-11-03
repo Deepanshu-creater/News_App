@@ -69,6 +69,7 @@ router.post('/login', async (req, res) => {
 
                 // console.log(req.cookie);
                 res.status(200).json({ message: "Succesfully logged in" });
+                console.log("Succesfully logged in", user , token);
             }
             else {
                 res.status(400).json({ message: "Invalid Credentials" });
